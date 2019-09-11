@@ -4,6 +4,17 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
+
+    public function seedProduction()
+    {
+    }
+
+    public function seedDev()
+    {
+        $this->seedUsers();
+    }
+
+
     /**
      * Seed the application's database.
      *
@@ -11,7 +22,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->seedUsers();
+        $this->seedProduction();
+
+        if (app()->environment() !== 'production') {
+            $this->seedDev();
+        }
     }
 
     public function seedUsers()
@@ -21,6 +36,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@fscs.pl',
             'password' => Hash::make('password')
         ]);
-        factory(App\User::class, 50)->create();
+
+        factory(App\User::class, 20)->create();
     }
 }

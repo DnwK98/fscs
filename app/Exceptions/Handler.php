@@ -2,8 +2,12 @@
 
 namespace App\Exceptions;
 
+use App\Fscs\HttpResponses\BaseResponse;
+use App\Fscs\HttpResponses\InternalServerErrorResponse;
+use App\Fscs\HttpResponses\NotFoundResponse;
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class Handler extends ExceptionHandler
 {
@@ -29,8 +33,9 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param  \Exception  $exception
+     * @param  \Exception $exception
      * @return void
+     * @throws Exception
      */
     public function report(Exception $exception)
     {
@@ -40,12 +45,29 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
-     * @return \Illuminate\Http\Response
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Exception $exception
+     * @return BaseResponse|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render($request, Exception $exception)
     {
-        return parent::render($request, $exception);
+        if(\App::environment() != 'local') {
+            return new InternalServerErrorResponse();
+        } else {
+            return parent::render($request, $exception);
+        }
+    }
+
+    /**
+     * @param HttpExceptionInterface $e
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function renderHttpException(HttpExceptionInterface $e)
+    {
+        $status = $e->getStatusCode();
+        if($status === 404){
+            return new NotFoundResponse();
+        }
+        return new InternalServerErrorResponse();
     }
 }

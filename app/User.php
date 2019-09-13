@@ -3,8 +3,13 @@
 namespace App;
 
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+
+/**
+ * @method static count()
+ * @method static find($id)
+ * @method static create(array $array)
+ */
 
 class User extends Authenticatable
 {

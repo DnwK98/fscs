@@ -6,7 +6,7 @@
  * Time: 18:22
  */
 
-namespace App\Fscs\HttpResponses;
+namespace App\Http\Responses;
 
 
 class InternalServerErrorResponse extends BaseResponse
@@ -14,8 +14,10 @@ class InternalServerErrorResponse extends BaseResponse
     protected $status = 500;
     protected $statusMessage = 'Internal Server Error';
 
-    public function __construct()
+    public function __construct($status)
     {
+        $this->status = $status;
+
         $this->metaAppend = [
             'debugToken' => bin2hex('fhnaslidfcjnasdklfj'),
         ];

@@ -6,7 +6,7 @@
  * Time: 18:13
  */
 
-namespace App\Fscs\HttpResponses;
+namespace App\Http\Responses;
 
 
 

@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 
-use App\Fscs\HttpRequests\UserListRequest;
-use App\Fscs\HttpRequestValidators\UserListRequestValidator;
-use App\Fscs\HttpResponses\BadRequestResponse;
-use App\Fscs\HttpResponses\MultipleElementsResponse;
-use App\Fscs\HttpResponses\NotFoundResponse;
-use App\Fscs\HttpResponses\SingleElementResponse;
+use App\Http\Requests\UserListRequest;
+use App\Http\RequestValidators\UserListRequestValidator;
+use App\Http\Responses\BadRequestResponse;
+use App\Http\Responses\MultipleElementsResponse;
+use App\Http\Responses\NotFoundResponse;
+use App\Http\Responses\SingleElementResponse;
 use App\Fscs\Services\User\UserService;
 use Illuminate\Http\Request;
 
@@ -21,6 +21,8 @@ class UserResourceController extends Controller
     {
         $this->userService = $userService;
         $this->userListRequestValidator = $userListRequestValidator;
+
+        $this->middleware('auth:api');
     }
 
     public function getList(Request $request)

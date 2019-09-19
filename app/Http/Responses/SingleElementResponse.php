@@ -6,7 +6,7 @@
  * Time: 18:22
  */
 
-namespace App\Fscs\HttpResponses;
+namespace App\Http\Responses;
 
 
 class SingleElementResponse extends BaseResponse

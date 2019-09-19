@@ -6,7 +6,7 @@
  * Time: 20:37
  */
 
-namespace App\Fscs\HttpRequestValidators\Dto;
+namespace App\Http\RequestValidators\Dto;
 
 
 class ValidationError

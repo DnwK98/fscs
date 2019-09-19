@@ -6,10 +6,10 @@
  * Time: 18:22
  */
 
-namespace App\Fscs\HttpResponses;
+namespace App\Http\Responses;
 
 
-use App\Fscs\HttpRequestValidators\Dto\ValidationError;
+use App\Http\RequestValidators\Dto\ValidationError;
 
 class BadRequestResponse extends BaseResponse
 {

@@ -2,9 +2,10 @@
 
 namespace App\Exceptions;
 
-use App\Fscs\HttpResponses\BaseResponse;
-use App\Fscs\HttpResponses\InternalServerErrorResponse;
-use App\Fscs\HttpResponses\NotFoundResponse;
+use App\Http\Responses\BaseResponse;
+use App\Http\Responses\InternalServerErrorResponse;
+use App\Http\Responses\MethodNotAllowedHttpResponse;
+use App\Http\Responses\NotFoundResponse;
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -52,7 +53,7 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
         if(\App::environment() != 'local') {
-            return new InternalServerErrorResponse();
+            return new InternalServerErrorResponse(500);
         } else {
             return parent::render($request, $exception);
         }
@@ -64,10 +65,17 @@ class Handler extends ExceptionHandler
      */
     protected function renderHttpException(HttpExceptionInterface $e)
     {
+        if(\App::environment() == 'local') {
+            return parent::renderHttpException($e);
+        }
+
         $status = $e->getStatusCode();
         if($status === 404){
             return new NotFoundResponse();
         }
-        return new InternalServerErrorResponse();
+        if($status === 405 ){
+            return new MethodNotAllowedHttpResponse($e->getHeaders()['Allow'] ?? "");
+        }
+        return new InternalServerErrorResponse($e->getStatusCode());
     }
 }

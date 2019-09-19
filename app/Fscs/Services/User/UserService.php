@@ -9,7 +9,7 @@
 namespace App\Fscs\Services\User;
 
 
-use App\Fscs\HttpRequests\UserListRequest;
+use App\Http\Requests\UserListRequest;
 use App\Fscs\Repositories\UserRepository;
 use App\Fscs\Services\User\Dto\UserDto;
 use App\User;

@@ -6,10 +6,10 @@
  * Time: 20:14
  */
 
-namespace App\Fscs\HttpRequestValidators;
+namespace App\Http\RequestValidators;
 
 
-use App\Fscs\HttpRequestValidators\Dto\ValidationError;
+use App\Http\RequestValidators\Dto\ValidationError;
 
 class Validator
 {
@@ -75,6 +75,15 @@ class Validator
     {
         if(empty(print_r($var, true))){
             $this->addError($name, 'Can not be empty');
+            return false;
+        }
+        return true;
+    }
+
+    public function string($var, $name = "variable")
+    {
+        if(!is_string($var)){
+            $this->addError($name, 'Must be string');
             return false;
         }
         return true;

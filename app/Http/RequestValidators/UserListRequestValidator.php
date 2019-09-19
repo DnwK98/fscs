@@ -6,10 +6,10 @@
  * Time: 20:14
  */
 
-namespace App\Fscs\HttpRequestValidators;
+namespace App\Http\RequestValidators;
 
 
-use App\Fscs\HttpRequests\UserListRequest;
+use App\Http\Requests\UserListRequest;
 
 class UserListRequestValidator extends Validator
 {

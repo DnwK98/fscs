@@ -58,4 +58,13 @@ class ApiTokenController extends Controller
             'expiresAt' => Carbon::parse($tokenResult->token->expires_at)->toDateTimeString()
         ]);
     }
+
+    public function me(Request $request)
+    {
+        if($user = $request->user()) {
+            return new SingleElementResponse($user);
+        } else {
+            return new UnauthorizedResponse();
+        }
+    }
 }

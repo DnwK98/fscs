@@ -13,6 +13,7 @@
 */
 Route::namespace('Auth')->group(function () {
     Route::post('/token', 'ApiTokenController@token')->name('api.token');
+    Route::get('/me', 'ApiTokenController@me')->name('api.me');
 });
 
 Route::prefix('v1')->group(function () {

@@ -25,6 +25,9 @@ class ApiTokenController extends Controller
     {
         $this->tokenAuthRequestValidator = $tokenAuthRequestValidator;
         $this->accessTokenRepository = $accessTokenRepository;
+
+        $this->middleware('auth:api')
+            ->only('me');
     }
 
     public function token(Request $request)

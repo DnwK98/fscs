@@ -15,9 +15,12 @@
 </template>
 
 <script>
+    import { apiGet, apiPost } from './ApiComponent'
     export default {
         mounted() {
-            console.log('Component mounted.')
+            apiGet({
+                url: "api/v1/user"
+            })
         }
     }
 </script>

@@ -13,6 +13,8 @@
     <app></app>
 </div>
 <!--<script src="{ mix('js/bootstrap.js') }"></script>-->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="{{ mix('js/app.js') }}"></script>
 </body>
 </html>

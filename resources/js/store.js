@@ -3,17 +3,24 @@ import Vue from 'vue'
 
 Vue.use(Vuex);
 
-const store = new Vuex.Store({
+let store = new Vuex.Store({
     state: {
         auth: {
             loggedIn: false,
-            userId: null
+            loginWindow: false,
+            userId: null,
+            userName: null,
+            userToken: null
         },
         count: 0
     },
     mutations: {
         increment (state) {
             state.count++
+        },
+        tokenExpired(state) {
+            state.auth.loggedIn = false;
+            state.auth.loginWindow = true;
         }
     }
 });

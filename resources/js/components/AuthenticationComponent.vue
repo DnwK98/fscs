@@ -7,29 +7,76 @@
         <div class="application-description center-windows">
             Counter Strike Server Automation
         </div>
-        <div class="login-window center-windows">
-            <label>Login</label><br />
-            <input type="text" name="login" autocomplete="off"> <br />
+        <transition name="fade">
+            <div class="login-window center-windows">
+                <label>Login</label><br/>
+                <input type="text" name="login" v-model="username" autocomplete="off"> <br/>
 
-            <label >Password</label><br />
-            <input type="password" name="password" autocomplete="off">
+                <label>Password</label><br/>
+                <input type="password" name="password" v-model="password" autocomplete="off">
 
-            <div class="login-submit">Login</div>
-        </div>
+                <div class="login-submit" @click="login">Login</div>
+            </div>
+        </transition>
 
     </div>
 </template>
 
 <script>
     import Vue from 'vue'
+    import { apiGet, apiPost } from './ApiComponent'
+    import {mapState} from 'vuex'
     import store from "../store";
 
 
     export default Vue.component('authentication', {
+        data: function () {
+            return {
+                username: "",
+                password: ""
+            }
+        },
         mounted() {
-
+            setTimeout(function () {
+                store.state.auth.userToken = getCookie("token");
+                apiGet({url: "api/me"}).then(function (response) {
+                    store.state.auth.loggedIn = true;
+                    store.state.auth.userName = response.data.name;
+                    store.state.auth.userId = response.data.id;
+                })
+            }, 1000);
+        }, computed: mapState([
+            "auth"
+        ]),
+        methods: {
+            login() {
+                apiPost({
+                    type: "POST",
+                    url: "api/token",
+                    data: {
+                        username: this.username,
+                        password: this.password
+                    }
+                })
+                    .then(function (response) {
+                        store.state.auth.loggedIn = true;
+                        store.state.auth.userToken = response.data.accessToken;
+                        document.cookie = "token=" + response.data.accessToken;
+                        apiGet({url: "api/me"}).then(function (response) {
+                            store.state.auth.userName = response.data.name;
+                            store.state.auth.userId = response.data.id;
+                        })
+                    })
+            }
         }
     })
+
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
+
 </script>
 
 <style scoped>
@@ -56,6 +103,15 @@
         padding: 5px 25px 40px 25px;
     }
 
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity .5s;
+    }
+
+    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
+    {
+        opacity: 0;
+    }
+
     .application-name {
         font-size: 140px;
         text-align: center;
@@ -72,13 +128,14 @@
     }
 
     .login-window input {
-        background-color: rgba(195,195,195, 0.3);
-        color: rgba(255,255,255, 0.9);
+        background-color: rgba(195, 195, 195, 0.3);
+        color: rgba(255, 255, 255, 0.9);
         padding: 8px;
         border: 0 solid #FFF;
         width: 100%;
 
     }
+
     .login-window input:focus {
         outline: none;
     }
@@ -86,7 +143,7 @@
     .login-window label {
         font-size: 14px;
         margin-top: 25px;
-        color: rgba(255,255,255, 0.7);
+        color: rgba(255, 255, 255, 0.7);
         letter-spacing: 2px;
     }
 
@@ -94,13 +151,13 @@
         margin-top: 60px;
         cursor: pointer;
         text-align: center;
-        padding:10px;
-        background-color: rgba(105,105,105, 0.4);
-        color: rgba(255,255,255, 0.9);
+        padding: 10px;
+        background-color: rgba(105, 105, 105, 0.4);
+        color: rgba(255, 255, 255, 0.9);
         letter-spacing: 1px;
     }
 
     .login-submit:hover {
-        background-color: rgba(105,105,105, 0.5);
+        background-color: rgba(105, 105, 105, 0.5);
     }
 </style>

@@ -8,6 +8,7 @@ let store = new Vuex.Store({
         auth: {
             loggedIn: false,
             loginWindow: false,
+            hadError: false,
             userId: null,
             userName: null,
             userToken: null
@@ -20,7 +21,6 @@ let store = new Vuex.Store({
         },
         tokenExpired(state) {
             state.auth.loggedIn = false;
-            state.auth.loginWindow = true;
         }
     }
 });

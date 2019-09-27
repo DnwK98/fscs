@@ -3,7 +3,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header">Example Component</div>
+                    <div class="card-header" @click="auth.userToken=false">Example Component</div>
 
                     <div class="card-body">
                         I'm an example component.
@@ -16,11 +16,16 @@
 
 <script>
     import { apiGet, apiPost } from './ApiComponent'
+    import store from "../store";
+    import {mapState} from 'vuex'
     export default {
         mounted() {
-            apiGet({
-                url: "api/v1/user"
-            })
-        }
+            setTimeout(function () {
+                apiGet({url: "api/v1/user"})
+            }, 10000);
+        },
+        computed: mapState([
+            "auth"
+        ]),
     }
 </script>

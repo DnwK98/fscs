@@ -34,7 +34,7 @@
             .fail(function (response) {
                 console.log(response);
                 if (response.status === 401) {
-                    store.commit("tokenExpired");
+                    //store.commit("tokenExpired");
                 }
             })
     }

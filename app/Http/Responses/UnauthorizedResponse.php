@@ -16,10 +16,6 @@ class UnauthorizedResponse extends BaseResponse
     protected $status = 401;
     protected $statusMessage = 'Unauthorized';
 
-    /**
-     * BadRequestResponse constructor.
-     * @param ValidationError[] $validationErrors
-     */
     public function __construct()
     {
         parent::__construct(null);

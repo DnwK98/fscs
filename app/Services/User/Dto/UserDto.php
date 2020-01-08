@@ -6,7 +6,7 @@
  * Time: 19:17
  */
 
-namespace App\Fscs\Services\User\Dto;
+namespace App\Services\User\Dto;
 
 
 class UserDto

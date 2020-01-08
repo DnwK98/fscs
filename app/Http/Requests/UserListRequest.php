@@ -1,31 +1,20 @@
 <?php
 
-
 namespace App\Http\Requests;
 
-
-use Illuminate\Http\Request;
-
-class UserListRequest
+/**
+ * @property int page
+ * @property int limit
+ */
+class UserListRequest extends Request
 {
-    /** @var int */
-    public $page;
-
-    /** @var int */
-    public $limit;
-
-    /** @var string */
-    public $nameSearch;
-
-    public static function createFromRequest(Request $request)
+    public function rules()
     {
-        return new UserListRequest($request);
-    }
-
-    private function __construct(Request $request)
-    {
-        $this->page = $request->get('page') ?? 1;
-        $this->limit = $request->get('limit') ?? 100;
-        $this->nameSearch = $request->get('nameSearch') ?? '';
+        return [
+            'page' => "numeric|min:1",
+            'limit' => "numeric|min:1",
+            'name' => "string",
+            'email' => "string"
+        ];
     }
 }

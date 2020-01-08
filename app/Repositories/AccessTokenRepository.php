@@ -6,7 +6,7 @@
  * Time: 20:39
  */
 
-namespace App\Fscs\Repositories;
+namespace App\Repositories;
 
 
 use Illuminate\Support\Facades\DB;

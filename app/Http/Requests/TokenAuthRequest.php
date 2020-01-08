@@ -4,25 +4,15 @@
 namespace App\Http\Requests;
 
 
-use Illuminate\Http\Request;
+use App\Http\Requests\Request;
 
-class TokenAuthRequest
+class TokenAuthRequest extends Request
 {
-    /** @var string */
-    public $username;
-
-    /** @var string */
-    public $password;
-
-
-    public static function createFromRequest(Request $request)
+    public function rules()
     {
-        return new TokenAuthRequest($request);
-    }
-
-    private function __construct(Request $request)
-    {
-        $this->username = $request->get('username') ?? "";
-        $this->password = $request->get('password') ?? "";
+        return [
+            'username' => 'string|required',
+            'password' => 'string|required',
+        ];
     }
 }

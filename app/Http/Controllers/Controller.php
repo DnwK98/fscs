@@ -2,23 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\RequestValidators\Validator;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
 
 class Controller extends BaseController
 {
-    private $validator;
-
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    public function getValidator()
+    protected function authorize($permission)
     {
-        if (!$this instanceof Validator){
-            $this->validator = new Validator();
+        $user = Auth::user();
+        if(!$user) {
+            throw new AuthorizationException();
         }
-        return $this->validator;
     }
 }

@@ -11,14 +11,13 @@
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::namespace('Auth')->group(function () {
-    Route::post('/token', 'ApiTokenController@token')->name('api.token');
-});
+
+Route::post('/token', 'TokenController@token')->name('api.token');
 
 Route::prefix('v1')->group(function () {
 
-    Route::get('/user', 'UserResourceController@getList')->name('api.user.list');
-    Route::get('/user/{id}', 'UserResourceController@get')->name('api.user.single');
+    Route::get('/user', 'UserController@getList')->name('api.user.list');
+    Route::get('/user/{id}', 'UserController@get')->name('api.user.single');
 
 });
 

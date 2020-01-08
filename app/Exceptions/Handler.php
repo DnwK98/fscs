@@ -2,12 +2,20 @@
 
 namespace App\Exceptions;
 
+use App\Http\Responses\BadRequestResponse;
 use App\Http\Responses\BaseResponse;
 use App\Http\Responses\InternalServerErrorResponse;
 use App\Http\Responses\MethodNotAllowedHttpResponse;
 use App\Http\Responses\NotFoundResponse;
+use App\Http\Responses\UnauthorizedResponse;
 use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Illuminate\Validation\UnauthorizedException;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class Handler extends ExceptionHandler
@@ -18,7 +26,11 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontReport = [
-        //
+        UnauthorizedException::class,
+        AuthorizationException::class,
+        AuthenticationException::class,
+        ValidationException::class,
+        HttpExceptionInterface::class
     ];
 
     /**
@@ -52,30 +64,33 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($exception instanceof UnauthorizedException ||
+            $exception instanceof AuthorizationException ||
+            $exception instanceof AuthenticationException
+        ) {
+            return new UnauthorizedResponse();
+        }
+
+        if ($exception instanceof ValidationException) {
+            return new BadRequestResponse($exception->errors());
+        }
+
+        if($exception instanceof HttpExceptionInterface){
+            $status = $exception->getStatusCode();
+            if($status === 404){
+                return new NotFoundResponse();
+            }
+            if($status === 405 ){
+                return new MethodNotAllowedHttpResponse($exception->getHeaders()['Allow'] ?? "");
+            }
+        }
         if(\App::environment() != 'local') {
-            return new InternalServerErrorResponse(500);
+            $debugToken = bin2hex(Str::random(10));
+            $message = str_replace(array("\n", "\r"), ' ', $exception->__toString());
+            Log::critical("[$debugToken] $message");
+            return new InternalServerErrorResponse(500, $debugToken);
         } else {
             return parent::render($request, $exception);
         }
-    }
-
-    /**
-     * @param HttpExceptionInterface $e
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function renderHttpException(HttpExceptionInterface $e)
-    {
-        if(\App::environment() == 'local') {
-            return parent::renderHttpException($e);
-        }
-
-        $status = $e->getStatusCode();
-        if($status === 404){
-            return new NotFoundResponse();
-        }
-        if($status === 405 ){
-            return new MethodNotAllowedHttpResponse($e->getHeaders()['Allow'] ?? "");
-        }
-        return new InternalServerErrorResponse($e->getStatusCode());
     }
 }

@@ -9,7 +9,7 @@
 namespace App\Http\Responses;
 
 
-class SingleElementResponse extends BaseResponse
+class ObjectResponse extends BaseResponse
 {
     public function __construct($data)
     {

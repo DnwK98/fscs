@@ -16,10 +16,7 @@ class BadRequestResponse extends BaseResponse
     protected $status = 400;
     protected $statusMessage = 'Bad Request';
 
-    /**
-     * BadRequestResponse constructor.
-     * @param ValidationError[] $validationErrors
-     */
+
     public function __construct($validationErrors)
     {
         $this->responseAppend['validationErrors'] = $validationErrors;

@@ -24,8 +24,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $out = $this->scheduleOutput();
+
+        $schedule->command('inspire')->appendOutputTo($out)->runInBackground()->hourly();
+//        $schedule->command('server:process:created')->appendOutputTo($out)->runInBackground()->everyMinute();
     }
 
     /**
@@ -38,5 +40,10 @@ class Kernel extends ConsoleKernel
         $this->load(__DIR__.'/Commands');
 
         require base_path('routes/console.php');
+    }
+
+    private function scheduleOutput()
+    {
+        return base_path("storage/logs/schedule-" . date("Y-m-d") . ".log");
     }
 }

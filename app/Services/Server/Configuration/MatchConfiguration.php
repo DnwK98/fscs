@@ -4,94 +4,101 @@
 namespace App\Services\Server\Configuration;
 
 
+use App\Enums\MapEnum;
 use App\Services\Server\Configuration\TeamConfiguration;
 
 class MatchConfiguration
 {
+    /** @var int */
+    private $matchId = 1;
+
+    /** @var string */
+    private $sideType = "standard";
+
+    /** @var string */
+    private $map = MapEnum::DE_DUST2;
+
+    /** @var string */
+    private $hostName = "FSCS Host";
+
+    /** @var string[] */
+    private $spectators = [];
+
+    /** @var TeamConfiguration[] */
+    private $teams = [];
+
     public function setMatchId(int $id): MatchConfiguration
     {
+        $this->matchId = $id;
         return $this;
     }
 
     public function setSideType(string $sideType): MatchConfiguration
     {
+        $this->sideType = $sideType;
         return $this;
     }
 
     public function setMap(string $mapName): MatchConfiguration
     {
+        if(in_array($mapName, MapEnum::Map())){
+            $this->map = $mapName;
+        }
         return $this;
     }
 
     public function setHostName(string $name): MatchConfiguration
     {
+        $this->hostName = $name;
         return $this;
     }
 
     public function addSpectator(string $steamId64): MatchConfiguration
     {
+        $this->spectators[] = $steamId64;
         return $this;
     }
 
     public function addTeam(TeamConfiguration $team): MatchConfiguration
     {
+        if(count($this->teams) <= 2){
+            $this->teams[] = $team;
+        }
+
         return $this;
+    }
+
+    public function getMatchId()
+    {
+        return $this->matchId;
     }
 
     public function generateJson(): string
     {
-        return <<<EOF
-{
-	"matchid": 10004,
-	"num_maps": 1,
-	"players_per_team": 1,
-	"min_players_to_ready": 1,
-	"min_spectators_to_ready": 0,
-	"skip_veto": true,
-	"veto_first": "team1",
-	"side_type": "standard",
 
-	"spectators": {
-		"players":
-		[
-		]
-	},
+        $array = [
+            "matchid" => $this->matchId,
+            "num_maps" => 1,
+            "min_players_to_ready" => 1,
+            "min_spectators_to_ready" => 0,
+            "skip_veto" => true,
+            "veto_first" => "team1",
+            "side_type" => "standard",
+            "spectators" => $this->spectators,
+            "maplist" => [$this->map],
+            "favored_percentage_team1" => 50,
+            "favored_percentage_text" => "I",
+            "cvars" => [
+                "hostname" => $this->hostName
+            ]
+        ];
+        $i = 0;
+        foreach ($this->teams as $team){
+            $array["players_per_team"] =  $team->getPlayersCount();
+            $array["team" . ++$i] = $team->__toArray();
+        }
 
-	"maplist":
-	[
-		"de_mirage"
-	],
-
-	"favored_percentage_team1": 50,
-	"favored_percentage_text": "HLTV Bets",
-
-	"team1": {
-		"name": "ProTeam",
-		"tag": "Pro",
-		"flag": "PL",
-		"logo": "PL",
-		"players":
-		{
-			"STEAM_0:0:53590160" : "Damian"
-		}
-	},
-
-	"team2": {
-		"name": "Dupa",
-		"tag": "Dupa",
-		"flag": "PL",
-		"logo": "PL",
-		"players":
-		{
-			"STEAM_0:1:527267964" : "Eryczek"
-		}
-	},
-
-	"cvars": {
-		"hostname": "Match server #1"
-	}
-}
-EOF;
+        return (string)json_encode($array, JSON_PRETTY_PRINT);
 
     }
 }

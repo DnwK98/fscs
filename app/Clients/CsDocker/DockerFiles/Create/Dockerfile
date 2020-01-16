@@ -10,6 +10,7 @@ RUN apt-get update \
 	lib32stdc++6 \
 	ca-certificates \
 	unzip \
+	iproute2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install SteamCMD
@@ -41,7 +42,7 @@ RUN cd /csgo/csgo && unzip get5_0.7.1.zip
 RUN cd /csgo/csgo/addons/sourcemod/plugins && mv disabled/get5_mysqlstats.smx get5_mysqlstats.smx
 
 # Contains wrapper scripts and .cfg files
-COPY _container /
+COPY ContainerFileSystem /
 
 # Set working directory for entrypoint script
 WORKDIR /csgo

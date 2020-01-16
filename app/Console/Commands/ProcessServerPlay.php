@@ -8,21 +8,21 @@ use App\Services\Log\Log;
 use App\Services\Server\ServerService;
 use Illuminate\Console\Command;
 
-class ProcessServerCreated extends Command
+class ProcessServerPlay extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'server:process:created';
+    protected $signature = 'server:process:play';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Process all servers on status created and starts counter-strike server';
+    protected $description = 'Process all servers on status play, if match finished kill cs server and send event';
 
     /** @var Log */
     protected $log;
@@ -46,10 +46,11 @@ class ProcessServerCreated extends Command
 
     public function handle()
     {
-        $serversIterator = $this->serverRepository->getAllByStatus(ServerStatusEnum::CREATED);
+        $this->log->debug("Execute ProcessServerPlay");
+        $serversIterator = $this->serverRepository->getAllByStatus(ServerStatusEnum::PLAY);
         foreach ($serversIterator as $server) {
             try {
-                $this->serverService->processServerCreated($server);
+                $this->serverService->processServerPlay($server);
             } catch (\Exception $e) {
                 $this->log->exception($e);
             }

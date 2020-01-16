@@ -17,7 +17,7 @@ class CreateGet5Tables extends Migration
             $table->unsignedInteger('matchid')->autoIncrement();
             $table->dateTime('start_time');
             $table->dateTime('end_time')->nullable();
-            $table->string('winner', 16)->default(0);
+            $table->string('winner', 16)->default("");
             $table->string('series_type', 64)->default("");
             $table->string('team1_name', 64)->default("");
             $table->integer('team1_score')->default(0);
@@ -79,8 +79,8 @@ class CreateGet5Tables extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('get5_stats_matches');
-        Schema::dropIfExists('get5_stats_maps');
         Schema::dropIfExists('get5_stats_players');
+        Schema::dropIfExists('get5_stats_maps');
+        Schema::dropIfExists('get5_stats_matches');
     }
 }

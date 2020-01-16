@@ -2,7 +2,6 @@
 
 namespace App;
 
-use DateTime;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -10,16 +9,17 @@ use Illuminate\Database\Eloquent\Model;
  * @method static find($id)
  * @method static create(array $array)
  *
- * @property int $matchid
- * @property int $mapnumber
- * @property DateTime $start_time
- * @property DateTime $end_time
- * @property string $winner
- * @property string $mapname
- * @property int $team1_score
- * @property int $team2_score
+ * @property int $id
+ * @property int $server_id
+ * @property int $team_number
+ * @property string $name
+ * @property string $tag
+ *
+ * @property Server $server
+ * @property TeamPlayer[] $players
  */
-class Get5StatsMap extends Model
+
+class ServerTeam extends Model
 {
 
     /**
@@ -27,7 +27,7 @@ class Get5StatsMap extends Model
      *
      * @var string
      */
-    protected $table = "get5_stats_maps";
+    protected $table = "server_teams";
 
     /**
      * Indicates if the model should be timestamped.
@@ -60,22 +60,17 @@ class Get5StatsMap extends Model
      * @var array
      */
     protected $casts = [
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
+
     ];
 
-    /**
-     * @return bool
-     */
-    public function hasScore()
+    public function server()
     {
-        return $this->team1_score > 0 || $this->team2_score > 0;
+        return $this->belongsTo(Server::class, 'server_id', 'id');
     }
 
-    public function isFinished()
+
+    public function players()
     {
-        return $this->team1_score > 15 ||
-            $this->team2_score > 15 ||
-            $this->team1_score === 15 && $this->team2_score === 15;
+        return $this->hasMany(TeamPlayer::class, 'team_id', 'id');
     }
 }

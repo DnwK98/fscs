@@ -26,8 +26,12 @@ class Kernel extends ConsoleKernel
     {
         $out = $this->scheduleOutput();
 
-        $schedule->command('inspire')->appendOutputTo($out)->runInBackground()->hourly();
-//        $schedule->command('server:process:created')->appendOutputTo($out)->runInBackground()->everyMinute();
+        if (app()->environment() === 'production') {
+            $schedule->command('image:build')->appendOutputTo($out)->runInBackground()->cron("0 */3 * * *");
+            $schedule->command('server:process:started')->appendOutputTo($out)->runInBackground()->everyMinute();
+            $schedule->command('server:process:play')->appendOutputTo($out)->runInBackground()->everyMinute();
+            $schedule->command('server:process:created')->appendOutputTo($out)->runInBackground()->everyMinute();
+        }
     }
 
     /**

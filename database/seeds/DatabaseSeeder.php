@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->seedUsers();
         $this->seedGet5();
+        $this->serverSeed();
     }
 
     /**
@@ -42,7 +43,7 @@ class DatabaseSeeder extends Seeder
 
     public function seedGet5()
     {
-        factory(App\Get5StatsMatch::class, 50)->create();
+        factory(App\Get5StatsMatch::class, 5)->create();
 
         /** @var \App\Get5StatsMatch $match */
         foreach (App\Get5StatsMatch::query()->getModels() as $match){
@@ -62,5 +63,10 @@ class DatabaseSeeder extends Seeder
                 'mapnumber' => $map->mapnumber,
             ]);
         }
+    }
+
+    public function serverSeed()
+    {
+        factory(App\Server::class, 1)->create();
     }
 }

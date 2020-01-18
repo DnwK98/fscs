@@ -14,12 +14,16 @@ use App\Server;
 use App\Services\Log\Log;
 use App\Services\Server\Configuration\MatchConfiguration;
 use App\Services\Server\Configuration\TeamConfiguration;
+use App\Services\Server\Dto\ServerDto;
 use Symfony\Component\VarDumper\VarDumper;
 
 class ServerService
 {
     /** @var CsDockerClient */
     private $docker;
+
+    /** @var ServerMappingService */
+    private $mappingService;
 
     /** @var ServerRepository */
     private $repository;
@@ -30,18 +34,25 @@ class ServerService
     /** @var Log */
     private $log;
 
-    public function __construct(CsDockerClient $docker, ServerRepository $repository, Get5StatsRepository $get5Repository, Log $log)
+    public function __construct(
+        CsDockerClient $docker,
+        ServerMappingService $mappingService,
+        ServerRepository $repository,
+        Get5StatsRepository $get5Repository,
+        Log $log
+    )
     {
         $this->docker = $docker;
+        $this->mappingService = $mappingService;
         $this->repository = $repository;
         $this->get5Repository = $get5Repository;
-        $this->log = $log->setComponent("app.service.server")->console();
+        $this->log = $log->setComponent("app.service.server");
     }
 
     public function processServerCreated(Server $server)
     {
         $this->log->info("Starting server {$server->id}");
-        if($this->startServer($server)){
+        if ($this->startServer($server)) {
             $server->status = ServerStatusEnum::STARTED;
             $server->save();
             $this->log->info("Server {$server->id} started successfully");
@@ -55,9 +66,9 @@ class ServerService
     public function processServerStarted(Server $server)
     {
         $map = $this->get5Repository->getMapByMatchId($server->match_id);
-        if($map instanceof Get5StatsMap){
+        if ($map instanceof Get5StatsMap) {
             $this->log->info("Match on server");
-            if($map->hasScore()){
+            if ($map->hasScore()) {
                 $server->status = ServerStatusEnum::PLAY;
                 $server->save();
                 $this->log->info("Match on server {$server->id} has started");
@@ -74,8 +85,8 @@ class ServerService
     public function processServerPlay(Server $server)
     {
         $map = $this->get5Repository->getMapByMatchId($server->match_id);
-        if($map instanceof Get5StatsMap){
-            if($map->isFinished()){
+        if ($map instanceof Get5StatsMap) {
+            if ($map->isFinished()) {
                 $this->log->info("Match on server {$server->id} has finished, removing server");
                 $this->killServer($server);
                 $server->status = ServerStatusEnum::FINISHED;
@@ -84,6 +95,22 @@ class ServerService
                 // Send event match finished with statistics
             }
         }
+    }
+
+    /**
+     * @param int $id
+     * @return ServerDto|null
+     */
+    public function getServerById(int $id)
+    {
+        $server = $this->repository->getById($id);
+        if (!$server instanceof Server) {
+            return null;
+        }
+        $get5Map = $this->get5Repository->getMapByMatchId($server->match_id);
+        $get5Players = $this->get5Repository->getPlayersByMatchId($server->match_id);
+
+        return $this->mappingService->mapServerToDtoWithStatistics($server, $get5Map, $get5Players);
     }
 
     public function createServer()
@@ -99,11 +126,11 @@ class ServerService
         $configuration->setHostName("Test server");
         $configuration->setMap($server->map);
 
-        foreach ($server->teams as $team){
+        foreach ($server->teams as $team) {
             $teamConfig = new TeamConfiguration();
             $teamConfig->setName($team->name);
             $teamConfig->setTag($team->tag);
-            foreach ($team->players as $player){
+            foreach ($team->players as $player) {
                 $teamConfig->addPlayer($player->steam_id_64, $player->name);
             }
             $configuration->addTeam($teamConfig);
@@ -152,7 +179,7 @@ class ServerService
             }
         }
 
-        if(!$this->containerRunningOnPort($port)) {
+        if (!$this->containerRunningOnPort($port)) {
             $this->log->error("After creating server $port it's not visible in docker ps");
             $this->log->error($this->docker->ps());
             return false;

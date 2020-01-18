@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int $matchid
  * @property int $mapnumber
- * @property string$steamid64
+ * @property string $steamid64
  * @property string $team
  * @property int $rounds_played
  * @property string $name

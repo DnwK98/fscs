@@ -6,13 +6,26 @@ namespace App\Repositories;
 
 use App\Server;
 use App\Utils\ModelsIterator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
 class ServerRepository
 {
+    /**
+     * @param $id
+     * @return Server|Model|null
+     */
     public function getById($id)
     {
-        return ['model'];
+        $query = Server::query();
+        $query->where(['id' => $id]);
+        $query->limit(1);
+        $query->with([
+            "teams",
+            "teams.players"
+        ]);
+
+        return $query->first();
     }
 
     /**

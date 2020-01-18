@@ -19,5 +19,9 @@ Route::prefix('v1')->group(function () {
     Route::get('/user', 'UserController@getList')->name('api.user.list');
     Route::get('/user/{id}', 'UserController@get')->name('api.user.single');
 
+    Route::get('/server/{id}', 'ServerController@get')->name('api.server.single');
+    Route::get('/server', 'ServerController@getList')->name('api.server.list');
+    Route::post('/server', 'ServerController@post')->name('api.server.create');
+
 });
 

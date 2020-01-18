@@ -5,7 +5,9 @@ namespace App\Repositories;
 
 
 use App\Get5StatsMap;
+use App\Get5StatsPlayer;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 class Get5StatsRepository
@@ -16,14 +18,19 @@ class Get5StatsRepository
      */
     public function getMapByMatchId($id)
     {
-        $query = Get5StatsMap::query();
-        $query->where(['matchid' => $id]);
-        $query->limit(1);
+        return Get5StatsMap::query()
+            ->where(['matchid' => $id])
+            ->first();
+    }
 
-        $maps = $query->getModels();
-        foreach ($maps as $map){
-            return $map;
-        }
-        return null;
+    /**
+     * @param int $id
+     * @return Get5StatsPlayer[]|Collection
+     */
+    public function getPlayersByMatchId(int $id)
+    {
+        return Get5StatsPlayer::query()
+            ->where(['matchid' => $id])
+            ->get();
     }
 }

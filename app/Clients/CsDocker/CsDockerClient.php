@@ -5,6 +5,7 @@ namespace App\Clients\CsDocker;
 
 
 use App\Clients\CsDocker\Exceptions\ContainerInUseException;
+use App\Clients\CsDocker\Exceptions\ServerImageNotFoundException;
 use App\Services\Server\Configuration\DataBaseConfiguration;
 use App\Services\Server\Configuration\MatchConfiguration;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -55,8 +56,10 @@ class CsDockerClient
             $process = $e->getProcess();
             $output = $process->getOutput() . "||" . $process->getErrorOutput();
 
-            if(strpos($output, "is already in use by container") !== false){
+            if(strpos($output, "is already in use by container") !== false) {
                 throw new ContainerInUseException($output);
+            } elseif(strpos($output, "Unable to find image") !== false){
+                throw new ServerImageNotFoundException($output);
             }
 
             // Rethrow if it is not common error

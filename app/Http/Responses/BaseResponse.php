@@ -1,15 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Damian
- * Date: 11.09.2019
- * Time: 18:13
- */
 
 namespace App\Http\Responses;
-
-
-
 
 use Illuminate\Http\JsonResponse;
 

@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\UnauthorizedException;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class Handler extends ExceptionHandler
@@ -73,6 +74,9 @@ class Handler extends ExceptionHandler
 
         if ($exception instanceof ValidationException) {
             return new BadRequestResponse($exception->errors());
+        }
+        if ($exception instanceof BadRequestHttpException) {
+            return new BadRequestResponse($exception->getMessage());
         }
 
         if($exception instanceof HttpExceptionInterface){

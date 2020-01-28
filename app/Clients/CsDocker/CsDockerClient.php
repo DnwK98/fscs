@@ -35,8 +35,8 @@ class CsDockerClient
         $command = '
             docker run \
                 -d \
-                -p '.$port.':27015/tcp \
-                -p '.$port.':27015/udp \
+                -p '.$port.':'.$port.'/tcp \
+                -p '.$port.':'.$port.'/udp \
                 -e SERVER_HOSTNAME="fscs_dev_server" \
                 -e RCON_PASSWORD="SN94NF7DK3" \
                 -e STEAM_ACCOUNT="8C5C4A8275069E74A8C6AA871C96D741" \
@@ -47,6 +47,7 @@ class CsDockerClient
                 -e DB_NAME="'.$this->escapeShellString($db->dbName).'" \
                 -e DB_PORT="'.$this->escapeShellString($db->dbPort).'" \
                 -e MATCH_ID="'.$this->escapeShellString($matchConfig->getMatchId()).'" \
+                -e SERVER_PORT="'.$this->escapeShellString($port).'" \
                 --name '.$this->containerPrefix.$port.' \
                 '.$this->imageName.'
         ';
@@ -142,6 +143,10 @@ class CsDockerClient
      */
     private function exec($command, $timeout = 300)
     {
+        // CRLF creates issues with multi line command so replace it
+        // for possibility of editing in Windows environment
+        $command = str_replace("\r\n", "\n", $command);
+
         $process = Process::fromShellCommandline($command);
         $process->setTimeout($timeout);
         $process->mustRun();

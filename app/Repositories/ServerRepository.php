@@ -57,4 +57,14 @@ class ServerRepository
         $query->whereIn('status', $status);
         return $query->count();
     }
+
+    public function save(Server $server)
+    {
+        $server->save();
+        $server->teams()->saveMany($server->teams);
+        foreach ($server->teams as $team){
+            $team->players()->saveMany($team->players);
+        }
+        return true;
+    }
 }

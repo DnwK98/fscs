@@ -1,31 +1,34 @@
 <?php
 
+
 namespace App;
 
+
+use DateTime;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @method static count()
- * @method static find($id)
- * @method static create(array $array)
+ * Class EventEntity
  *
- * @property int $id
- * @property int $match_id
- * @property string $map
- * @property int $port
- * @property string $status
- * @property ServerTeam[] $teams
+ * @property string name
+ * @property string int_index
+ * @property int int_1
+ * @property int int_2
+ * @property int int_3
+ * @property string string_index
+ * @property string string_1
+ * @property string content
+ * @property DateTime created
+ *
  */
-
-class Server extends Model
+class EventEntity extends Model
 {
-
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = "servers";
+    protected $table = "events";
 
     /**
      * Indicates if the model should be timestamped.
@@ -58,22 +61,6 @@ class Server extends Model
      * @var array
      */
     protected $casts = [
-
+        'created' => 'datetime',
     ];
-
-    public static function Boot()
-    {
-        parent::Boot();
-
-        self::creating(function ($server) {
-            if (!isset($server->match_id)) {
-                $server->match_id = (int)time();
-            }
-        });
-    }
-
-    public function teams()
-    {
-        return $this->hasMany(ServerTeam::class, 'server_id', 'id');
-    }
 }

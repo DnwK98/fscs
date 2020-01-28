@@ -12,10 +12,21 @@ abstract class Request extends FormRequest
     public function validateResolved()
     {
         $this->castUserInput();
+        if(($e = $this->customRules()) !== []) {
+            throw ValidationException::withMessages($e);
+        }
         parent::validateResolved();
     }
 
     public function rules()
+    {
+        return [];
+    }
+
+    /**
+     * @return array Validation errors
+     */
+    public function customRules()
     {
         return [];
     }

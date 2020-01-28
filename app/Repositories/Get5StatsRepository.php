@@ -25,12 +25,12 @@ class Get5StatsRepository
 
     /**
      * @param int $id
-     * @return Get5StatsPlayer[]|Collection
+     * @return Get5StatsPlayer[]
      */
     public function getPlayersByMatchId(int $id)
     {
         return Get5StatsPlayer::query()
             ->where(['matchid' => $id])
-            ->get();
+            ->getModels();
     }
 }

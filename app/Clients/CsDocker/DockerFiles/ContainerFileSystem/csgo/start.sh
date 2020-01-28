@@ -14,6 +14,8 @@ export MAPGROUP="${MAPGROUP:-mg_active}"
 export MAXPLAYERS="${MAXPLAYERS:-12}"
 export TICKRATE="${TICKRATE:-128}"
 
+
+export SERVER_PORT="${SERVER_PORT:-}"
 export MATCH_ID="${MATCH_ID:-}"
 export STEAM_ACCOUNT="${STEAM_ACCOUNT:-}"
 export JSON_MATCH_CONFIGURATION="${JSON_MATCH_CONFIGURATION:-}"
@@ -22,6 +24,7 @@ export DB_USER="${DB_USER:-}"
 export DB_PASSWORD="${DB_PASSWORD:-}"
 export DB_PORT="${DB_PORT:-}"
 
+[[ -z "$SERVER_PORT" ]] && echo "Empty SERVER_PORT" && exit 1;
 [[ -z "$MATCH_ID" ]] && echo "Empty MATCH_ID" && exit 1;
 [[ -z "$STEAM_ACCOUNT" ]] && echo "Empty STEAM_ACCOUNT" && exit 1;
 [[ -z "$JSON_MATCH_CONFIGURATION" ]] && echo "Empty JSON_MATCH_CONFIGURATION" && exit 1;
@@ -143,7 +146,7 @@ cat /csgo/csgo/addons/sourcemod/configs/get5/match.json
     -usercon \
     -game csgo \
     -tickrate ${TICKRATE} \
-    -port 27015 \
+    -port $(SERVER_PORT) \
     -maxplayers_override ${MAXPLAYERS} \
     +game_type ${GAME_TYPE} \
     +game_mode ${GAME_MODE} \

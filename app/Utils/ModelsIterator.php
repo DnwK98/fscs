@@ -99,7 +99,6 @@ class ModelsIterator implements Iterator
 
         /** @var LengthAwarePaginator $pagination */
         $pagination = $query->paginate($this->chunkSize, ['*'], 'page', 1);
-        $pagination->getIterator();
         $models = $pagination->getCollection()->all();
 
         if(empty($models)){

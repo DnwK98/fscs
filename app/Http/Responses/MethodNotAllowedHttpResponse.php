@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Damian
- * Date: 13.09.2019
- * Time: 19:17
- */
 
 namespace App\Http\Responses;
 

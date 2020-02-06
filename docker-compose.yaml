@@ -1,0 +1,53 @@
+version: "2"
+
+services:
+    fscs-executor:
+        image: fscs-executor
+        container_name: fscs-executor-app
+        restart: always
+        ports:
+            - "${APP_PORT}:80"
+        volumes:
+            - ./.env:/app/fscs-executor/.env/:ro
+        env_file:
+            - ./.env
+        depends_on:
+            - mysql
+        networks:
+            - fscs-executor-network
+        logging:
+            driver: json-file
+            options:
+                max-size: "200k"
+                max-file: "10"
+
+    mysql:
+        image: mysql:5.7.29
+        container_name: fscs-executor-mysql
+        restart: always
+        ports:
+            - "${DB_PORT}:3306"
+        environment:
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+        env_file:
+          - ./.env
+        volumes:
+            - ./docker_storage/mysql_data:/var/lib/mysql
+        networks:
+            - fscs-executor-network
+        logging:
+            driver: json-file
+            options:
+                max-size: "200k"
+                max-file: "10"
+
+networks:
+    fscs-executor-network:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: ${NETWORK_IP}
+                  gateway: ${NETWORK_GATEWAY}

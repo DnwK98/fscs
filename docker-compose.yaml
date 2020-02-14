@@ -8,11 +8,13 @@ services:
         ports:
             - "${APP_PORT}:80"
         volumes:
+            # Mount docker socket inside docker container to get access
+            # to docker engine inside (required for building and starting servers)
+            - /var/run/docker.sock:/var/run/docker.sock
             - ./.env:/app/fscs-executor/.env/:ro
+#            - ./docker_storage/app_logs/:/app/fscs-executor/storage/logs/:rw
         env_file:
             - ./.env
-        depends_on:
-            - mysql
         networks:
             - fscs-executor-network
         logging:

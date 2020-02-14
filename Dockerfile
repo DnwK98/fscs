@@ -15,24 +15,25 @@ RUN apt-get update && \
 
 # Install packages
 RUN apt-get update && apt-get install -y \
+        vim \
+        curl \
+        wget \
+        nginx-full \
+        mysql-client \
+        libreoffice-common \
+        libreoffice-base mc \
         php7.3 \
         php7.3-dom \
         php7.3-curl \
-        vim \
         php7.3-intl \
         php7.3-mysql \
         php7.3-zip \
         php7.3-mbstring \
         php7.3-gd \
         php7.3-imagick\
-        nginx-full \
-        curl \
-        mysql-client \
         php7.3-dev \
         php7.3-xmlrpc \
-        libreoffice-common \
-        php7.3-apcu \
-        libreoffice-base mc && \
+        php7.3-apcu  && \
         apt-get remove --purge -y $BUILD_PACKAGES && \
         rm -rf /var/lib/apt/lists/*
 
@@ -45,7 +46,6 @@ RUN apt-get update && apt-get install -y \
         libcurl4-openssl-dev \
         libcurl4-openssl-dev \
         pkg-config libsasl2-dev \
-        wget \
         xfonts-base \
         xfonts-75dpi \
         libxrender1 \
@@ -69,38 +69,53 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
     php -r "unlink('composer-setup.php');" && \
     mv composer.phar /usr/local/bin/composer
 
-# Create user with provided uid and gid
-RUN groupadd -g 1001 appuser && \
-    useradd --no-log-init -r -u 1001 -g appuser appuser && \
+# Install docker and docker-compose
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - && \
+    sudo add-apt-repository \
+        "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+        $(lsb_release -cs) \
+        stable" && \
+    apt-get update && apt-get install -y \
+        docker-ce \
+        docker-ce-cli \
+        containerd.io && \
+    curl -L "https://github.com/docker/compose/releases/download/1.25.3/docker-compose-$(uname -s)-$(uname -m)" \
+        -o /usr/local/bin/docker-compose && \
+    chmod +x /usr/local/bin/docker-compose
+
+
+# Create user with provided uid and gid and add to docker group
+RUN useradd --no-log-init -r -u 999 -g docker appuser && \
     mkhomedir_helper appuser && \
-    echo "Created user 'appuser' 1001 in group 1001"
+    echo "Created user 'appuser' 999 in group 999 (docker)"
 
 # Change apache user
 RUN echo "export APACHE_RUN_USER=appuser" >> /etc/apache2/envvars
-RUN echo "export APACHE_RUN_GROUP=appuser" >> /etc/apache2/envvars
+RUN echo "export APACHE_RUN_GROUP=docker" >> /etc/apache2/envvars
 
 # Change php.ini using sed and regex
-RUN sed -i 's/memory_limit = .*/memory_limit = 512M/' /etc/php/7.3/apache2/php.ini
-RUN sed -i 's/upload_max_filesize = .*/upload_max_filesize = 50M/' /etc/php/7.3/apache2/php.ini
-RUN sed -i 's/max_file_uploads = .*/max_file_uploads = 50/' /etc/php/7.3/apache2/php.ini
-RUN sed -i 's/max_execution_time = .*/max_execution_time = 60/' /etc/php/7.3/apache2/php.ini
-RUN sed -i 's/post_max_size = .*/post_max_size = 50M/' /etc/php/7.3/apache2/php.ini
-RUN sed -i 's/KeepAliveTimeout .*/KeepAliveTimeout 10/' /etc/apache2/apache2.conf
-RUN a2enmod rewrite headers
+RUN sed -i 's/memory_limit = .*/memory_limit = 512M/' /etc/php/7.3/apache2/php.ini && \
+    sed -i 's/upload_max_filesize = .*/upload_max_filesize = 50M/' /etc/php/7.3/apache2/php.ini && \
+    sed -i 's/max_file_uploads = .*/max_file_uploads = 50/' /etc/php/7.3/apache2/php.ini && \
+    sed -i 's/max_execution_time = .*/max_execution_time = 60/' /etc/php/7.3/apache2/php.ini && \
+    sed -i 's/post_max_size = .*/post_max_size = 50M/' /etc/php/7.3/apache2/php.ini && \
+    sed -i 's/KeepAliveTimeout .*/KeepAliveTimeout 10/' /etc/apache2/apache2.conf && \
+    a2enmod rewrite headers
 
 # Set PHP CLI version
 RUN update-alternatives --set php /usr/bin/php7.3 > /dev/null
 
 # Copy files to docker container filesystem
 ADD ./docker_filesystem/etc/apache2/sites-enabled/0-fscs-executor.conf /etc/apache2/sites-enabled/0-fscs-executor.conf
-ADD ./docker_filesystem/entrypoint.sh /entrypoint.sh
-RUN chmod +rx /entrypoint.sh
 
 # Copy and link application directory
-ADD --chown=appuser:appuser . /app/fscs-executor
+ADD --chown=appuser:docker . /app/fscs-executor
 RUN chmod -R 777 /app/fscs-executor/storage && \
     rm -rf /var/www/html && \
     ln -s /app/fscs-executor/public /var/www/html
+
+# Setup cron
+RUN sudo -u appuser crontab /app/fscs-executor/crontab.txt
 
 # Composer install
 RUN cd /app/fscs-executor && \
@@ -109,5 +124,5 @@ RUN cd /app/fscs-executor && \
 # Show files
 RUN ls -la /app/fscs-executor
 
-# Set entrypoint to supervisor
+# Set supervisor entrypoint
 ENTRYPOINT supervisord -n -c /app/fscs-executor/supervisord.conf

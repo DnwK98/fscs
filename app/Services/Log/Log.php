@@ -67,7 +67,10 @@ class Log
         }
 
         // Add stack trace to easier debug
-        if($this->debug) {
+        if(
+            $this->debug &&
+            in_array($level, ['debug', 'error'])
+        ) {
             $stackTrace = (new \Exception())->getTraceAsString();
             $message .= " | Trace: " . $stackTrace;
         }

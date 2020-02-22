@@ -4,6 +4,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Events\Event;
 use App\Http\Requests\EventListRequest;
 use App\Http\Requests\Request;
 use App\Http\Responses\ListResponse;
@@ -25,7 +26,7 @@ class EventController extends Controller
         $count = $this->eventAccess->getEventsCount();
 
         return new ListResponse(
-            array_map(function ($event){return $event->__toArray();}, $events),
+            array_map(function ($event){ /** @var Event $event */return $event->__toArray();}, $events),
             $request->page,
             $request->limit,
             $count

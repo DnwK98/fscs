@@ -9,9 +9,11 @@ use App\Enums\ServerStatusEnum;
 use App\Http\Requests\ServerCreateRequest;
 use App\Http\Responses\BadRequestResponse;
 use App\Http\Responses\CreatedResponse;
+use App\Http\Responses\ListResponse;
 use App\Http\Responses\NotFoundResponse;
 use App\Http\Responses\ObjectResponse;
 use App\Http\Responses\OkResponse;
+use App\Server;
 use App\Services\Server\Dto\ServerDto;
 use App\Services\Server\ServerService;
 use Illuminate\Validation\ValidationException;
@@ -46,7 +48,19 @@ class ServerController
 
     public function getList()
     {
+        $servers = Server::all();
+        $responseData = [];
 
+        foreach ($servers as $serverEntity){
+            $responseData[] = $this->serverService->getServerById($serverEntity->id);
+        }
+
+        return new ListResponse(
+            $responseData,
+            1,
+            count($responseData),
+            count($responseData)
+        );
     }
 
     public function post(ServerCreateRequest $request)
@@ -76,11 +90,12 @@ class ServerController
             ServerStatusEnum::RESTARTED,
             ServerStatusEnum::PLAY,
         ])) {
-            return new BadRequestResponse(['id' => 'This server canno\'t be restarted']);
+            return new BadRequestResponse(['id' => 'This server cannot be restarted']);
         }
 
-        $server->status = ServerStatusEnum::RESTARTED;
-        $server->save();
+        $serverEntity = Server::find($server->id);
+        $serverEntity->status = ServerStatusEnum::RESTARTED;
+        $serverEntity->save();
 
         return new OkResponse();
     }

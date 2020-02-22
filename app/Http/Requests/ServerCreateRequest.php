@@ -36,17 +36,26 @@ class ServerCreateRequest extends Request
             if(!isset($team['name']) || !is_string($team['name'])){
                 return ['teams.team.name' => "Must be string"];
             }
+            if(strlen($team['name']) < 2){
+                return ['teams.team.name' => "Must be greater than 2 characters"];
+            }
             if(strlen($team['name']) > 50){
                 return ['teams.team.name' => "Must be shorter than 50 characters"];
             }
             if(!isset($team['tag']) || !is_string($team['tag'])){
                 return ['teams.team.tag' => "Must be string"];
             }
+            if(strlen($team['tag']) < 1){
+                return ['teams.team.tag' => "Must be greater than 1 character"];
+            }
             if(strlen($team['tag']) > 6){
                 return ['teams.team.tag' => "Must be shorter than 6 characters"];
             }
             if(!isset($team['players']) || !is_array($team['players'])){
                 return ['teams.team.players' => "Must be array"];
+            }
+            if(count($team['players']) === 0){
+                return ['teams.team.players' => "Players count must be greater than 0"];
             }
 
             foreach ($team['players'] as $player){

@@ -11,8 +11,6 @@ class IndexController extends Controller
 
     public function index()
     {
-        return new ObjectResponse([
-            'application' => "FSCS"
-        ]);
+        return view('frontend', []);
     }
 }

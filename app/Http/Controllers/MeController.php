@@ -12,10 +12,8 @@ class MeController extends Controller
 {
     public function get(Request $request)
     {
-        if($user = $request->user()) {
-            return new ObjectResponse($user);
-        } else {
-            return new UnauthorizedResponse();
-        }
+        $this->authorize();
+
+        return new ObjectResponse("Authorized");
     }
 }

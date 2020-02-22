@@ -12,3 +12,4 @@
 */
 
 Route::get('/', 'IndexController@index')->name('web.index');
+Route::get('/frontend', 'IndexController@frontend')->name('web.frontend');

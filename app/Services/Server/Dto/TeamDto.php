@@ -15,6 +15,6 @@ class TeamDto
     /** @var int */
     public $score;
 
-    /** @var  */
+    /** @var array */
     public $players;
 }

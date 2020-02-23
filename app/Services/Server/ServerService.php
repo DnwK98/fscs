@@ -98,7 +98,13 @@ class ServerService
     public function processServerRestarted(Server $server)
     {
         $this->log->info("Restarting server {$server->id} on port {$server->port}");
-        $this->restartServer($server);
+        if($this->restartServer($server)){
+            $server->status = ServerStatusEnum::STARTED;
+            $server->save();
+            $this->log->info("Server {$server->id} restarted successfully");
+        } else {
+            $this->log->error("Server {$server->id} could not restart");
+        }
     }
 
     public function processServerPlay(Server $server)

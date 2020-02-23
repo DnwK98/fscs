@@ -146,7 +146,7 @@ cat /csgo/csgo/addons/sourcemod/configs/get5/match.json
     -usercon \
     -game csgo \
     -tickrate ${TICKRATE} \
-    -port $(SERVER_PORT) \
+    -port ${SERVER_PORT} \
     -maxplayers_override ${MAXPLAYERS} \
     +game_type ${GAME_TYPE} \
     +game_mode ${GAME_MODE} \

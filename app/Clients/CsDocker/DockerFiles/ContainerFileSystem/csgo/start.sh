@@ -70,11 +70,11 @@ cat << DATABASE > /csgo/csgo/addons/sourcemod/configs/databases.cfg
 	{
 		"driver"			"default"
 		"host"				"${GATEWAY_IP}"
+		"port"			    "${DB_PORT}"
 		"database"			"${DB_NAME}"
 		"user"				"${DB_USER}"
 		"pass"				"${DB_PASSWORD}"
 		//"timeout"			"0"
-		//"port"			"0"
 	}
 
 	"storage-local"

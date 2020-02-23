@@ -16,6 +16,8 @@ Route::post('/token', 'TokenController@token')->name('api.token');
 
 Route::prefix('v1')->group(function () {
 
+    Route::get('/me', 'UserController@getList')->name('api.me');
+
     Route::get('/user', 'UserController@getList')->name('api.user.list');
     Route::get('/user/{id}', 'UserController@get')->name('api.user.single');
 

@@ -4,6 +4,7 @@
 namespace App\Clients\CsDocker;
 
 
+use App\Clients\CsDocker\Builders\DockerContainerBuilder;
 use App\Clients\CsDocker\Exceptions\ContainerInUseException;
 use App\Clients\CsDocker\Exceptions\ServerImageNotFoundException;
 use App\Services\Server\Configuration\DataBaseConfiguration;
@@ -32,25 +33,26 @@ class CsDockerClient
         $jsonMatchConfig = $matchConfig->generateJson();
         $db = $this->dataBaseConfiguration;
 
-        $command = '
-            docker run \
-                -d \
-                -p '.$port.':'.$port.'/tcp \
-                -p '.$port.':'.$port.'/udp \
-                -e SERVER_HOSTNAME="fscs_dev_server" \
-                -e RCON_PASSWORD="SN94NF7DK3" \
-                -e STEAM_ACCOUNT="8C5C4A8275069E74A8C6AA871C96D741" \
-                -e MAXPLAYERS="12" \
-                -e JSON_MATCH_CONFIGURATION="'.$this->escapeShellString($jsonMatchConfig).'" \
-                -e DB_USER="'.$this->escapeShellString($db->dbUser).'" \
-                -e DB_PASSWORD="'.$this->escapeShellString($db->dbPassword).'" \
-                -e DB_NAME="'.$this->escapeShellString($db->dbName).'" \
-                -e DB_PORT="'.$this->escapeShellString($db->dbPort).'" \
-                -e MATCH_ID="'.$this->escapeShellString($matchConfig->getMatchId()).'" \
-                -e SERVER_PORT="'.$this->escapeShellString($port).'" \
-                --name '.$this->containerPrefix.$port.' \
-                '.$this->imageName.'
-        ';
+        $containerBuilder = new DockerContainerBuilder();
+        $containerBuilder
+            ->addPortMapping($port, $port)
+            ->addEnv('SERVER_HOSTNAME', 'fscs_dev_server')
+            ->addEnv('RCON_PASSWORD', 'SN94NF7DK3')
+            ->addEnv('STEAM_ACCOUNT', '8C5C4A8275069E74A8C6AA871C96D741')
+            ->addEnv('MAXPLAYERS', '12')
+            ->addEnv('MAP', $matchConfig->getMap())
+            ->addEnv('JSON_MATCH_CONFIGURATION', $jsonMatchConfig)
+            ->addEnv('DB_USER', $db->dbUser)
+            ->addEnv('DB_PASSWORD', $db->dbPassword)
+            ->addEnv('DB_NAME', $db->dbName)
+            ->addEnv('DB_PORT', $db->dbPort)
+            ->addEnv('MATCH_ID', $matchConfig->getMatchId())
+            ->addEnv('SERVER_PORT', $port)
+            ->setContainerName($this->containerPrefix . $port)
+            ->setImage($this->imageName);
+
+        $command = $containerBuilder->getCommand();
+
         try {
             return $this->exec($command);
         } catch (ProcessFailedException $e){
@@ -152,10 +154,5 @@ class CsDockerClient
         $process->mustRun();
 
         return $process->getOutput();
-    }
-
-    private function escapeShellString($str)
-    {
-        return str_replace('"', '\"', $str);
     }
 }

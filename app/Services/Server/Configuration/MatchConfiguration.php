@@ -39,6 +39,11 @@ class MatchConfiguration
         return $this;
     }
 
+    public function getMap()
+    {
+        return $this->map;
+    }
+
     public function setMap(string $mapName): MatchConfiguration
     {
         if(in_array($mapName, MapEnum::Map())){

@@ -1,0 +1,30 @@
+version: "2.1"
+
+services:
+    fscs-executor:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        volumes:
+            - ./.env.tests:/app/fscs-executor/.env/:ro
+        links:
+            - mysql
+        depends_on:
+            mysql:
+                condition: service_healthy
+        command: >
+            bash -c "
+                php artisan migrate:refresh --seed --quiet &&
+                php vendor/phpunit/phpunit/phpunit
+            "
+    mysql:
+        image: mysql:5.7.29
+        environment:
+            MYSQL_USER: test
+            MYSQL_PASSWORD: test
+            MYSQL_DATABASE: test
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+        healthcheck:
+            test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+            timeout: 20s
+            retries: 10

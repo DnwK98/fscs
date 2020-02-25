@@ -121,8 +121,11 @@ RUN sudo -u appuser crontab /app/fscs-executor/crontab.txt
 RUN cd /app/fscs-executor && \
     sudo -u appuser composer install --no-interaction --no-plugins --no-scripts
 
+# Set working directory
+WORKDIR /app/fscs-executor
+
 # Show files
-RUN ls -la /app/fscs-executor
+RUN ls -la
 
 # Set supervisor entrypoint
-ENTRYPOINT supervisord -n -c /app/fscs-executor/supervisord.conf
+CMD supervisord -n -c /app/fscs-executor/supervisord.conf

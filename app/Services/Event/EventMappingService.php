@@ -43,17 +43,15 @@ class EventMappingService
     public function mapEntityToEvent(EventEntity $entity)
     {
         $class = "App/Events/{$entity->name}";
+        $event = null;
+
         if (!class_exists($class)) {
             $event = new Event();
-            $event->array = json_decode($entity->content, true);
-
-            return $event;
+        } else {
+            $event = new $class;
         }
 
-        /** @var Event $event */
-        $event = new $class;
         $event->array = json_decode($entity->content, true);
-
         return $event;
     }
 }

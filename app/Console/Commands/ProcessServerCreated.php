@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Enums\ServerStatusEnum;
 use App\Repositories\ServerRepository;
 use App\Services\Log\Log;
+use App\Services\Server\DockerServerManagementService;
 use App\Services\Server\ServerService;
 use Illuminate\Console\Command;
 
@@ -27,20 +28,20 @@ class ProcessServerCreated extends Command
     /** @var Log */
     protected $log;
 
-    /** @var ServerService */
-    protected $serverService;
+    /** @var DockerServerManagementService */
+    protected $dockerServerService;
 
     /** @var ServerRepository */
     protected $serverRepository;
 
 
-    public function __construct(Log $log, ServerService $serverService, ServerRepository $serverRepository)
+    public function __construct(Log $log, DockerServerManagementService $dockerServerService, ServerRepository $serverRepository)
     {
         parent::__construct();
 
         $this->log = $log->setComponent('command.server.process');
-        $this->serverService = $serverService;
         $this->serverRepository = $serverRepository;
+        $this->dockerServerService = $dockerServerService;
     }
 
 
@@ -49,7 +50,7 @@ class ProcessServerCreated extends Command
         $serversIterator = $this->serverRepository->getAllByStatus(ServerStatusEnum::CREATED);
         foreach ($serversIterator as $server) {
             try {
-                $this->serverService->processServerCreated($server);
+                $this->dockerServerService->processServerCreated($server);
             } catch (\Exception $e) {
                 $this->log->exception($e);
             }

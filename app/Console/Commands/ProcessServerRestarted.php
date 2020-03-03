@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Enums\ServerStatusEnum;
 use App\Repositories\ServerRepository;
 use App\Services\Log\Log;
+use App\Services\Server\DockerServerManagementService;
 use App\Services\Server\ServerService;
 use Illuminate\Console\Command;
 
@@ -27,14 +28,14 @@ class ProcessServerRestarted extends Command
     /** @var Log */
     protected $log;
 
-    /** @var ServerService */
+    /** @var DockerServerManagementService */
     protected $serverService;
 
     /** @var ServerRepository */
     protected $serverRepository;
 
 
-    public function __construct(Log $log, ServerService $serverService, ServerRepository $serverRepository)
+    public function __construct(Log $log, DockerServerManagementService $serverService, ServerRepository $serverRepository)
     {
         parent::__construct();
 
